@@ -38,8 +38,9 @@ public class CorporateActionServiceImpl implements CorporateActionService {
         }
         if (spreadSheetValues.size() > 0)
         {
+            List<Object> headers = spreadSheetValues.remove(0);
             for ( List<Object> row : spreadSheetValues ) {
-                if (spreadSheetValues.remove(0).get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
+                if (headers.get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
                         && row.get(Indices.PROCESSESD_DATE).toString().equalsIgnoreCase(date()))
                 {
                     CorporateAction corporateAction = new CorporateAction();
