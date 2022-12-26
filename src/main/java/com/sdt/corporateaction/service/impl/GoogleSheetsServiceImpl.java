@@ -30,7 +30,7 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
     private GoogleAuthorizationConfig googleAuthorizationConfig;
 
     @Override
-    public void getSpreadsheetValues() throws IOException, GeneralSecurityException {
+    public List<List<Object>> getSpreadsheetValues() throws IOException, GeneralSecurityException {
         Sheets sheetsService = googleAuthorizationConfig.getSheetsService();
         Sheets.Spreadsheets.Values.BatchGet request =
                 sheetsService.spreadsheets().values().batchGet(spreadsheetId);
@@ -38,12 +38,13 @@ public class GoogleSheetsServiceImpl implements GoogleSheetsService {
         request.setMajorDimension("ROWS");
         BatchGetValuesResponse response = request.execute();
         List<List<Object>> spreadSheetValues = response.getValueRanges().get(0).getValues();
-        List<Object> headers = spreadSheetValues.remove(0);
-        for ( List<Object> row : spreadSheetValues ) {
-            LOGGER.info("{}: {}, {}: {}, {}: {}, {}: {}",
-                    headers.get(0),row.get(0), headers.get(1),row.get(1),
-                    headers.get(2),row.get(2), headers.get(3),row.get(3));
-        }
+        return spreadSheetValues;
+//        List<Object> headers = spreadSheetValues.remove(0);
+//        for ( List<Object> row : spreadSheetValues ) {
+//            LOGGER.info("{}: {}, {}: {}, {}: {}, {}: {}",
+//                    headers.get(0),row.get(0), headers.get(1),row.get(1),
+//                    headers.get(2),row.get(2), headers.get(3),row.get(3));
+//        }
     }
 
     private List<String> getSpreadSheetRange() throws IOException, GeneralSecurityException {
