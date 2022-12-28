@@ -6,11 +6,11 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(schema = "GLOBAL_PNL_TEMP")
+@Table(name = "GLOBAL_PNL_TEMP")
 @Getter @Setter
 public class GlobalDetailPnlTmp {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "Id", nullable = false)
     private Long id;
     @Column(name="COMPANY_CODE")

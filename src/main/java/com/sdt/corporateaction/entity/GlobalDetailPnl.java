@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(schema = "GLOBAL_DETAIL_PNL")
+@Table(name = "GLOBAL_DETAIL_PNL")
 @Getter @Setter
 public class GlobalDetailPnl {
     @Id
