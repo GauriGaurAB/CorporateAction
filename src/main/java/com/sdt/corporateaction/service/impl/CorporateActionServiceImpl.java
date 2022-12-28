@@ -3,6 +3,10 @@ package com.sdt.corporateaction.service.impl;
 import com.sdt.corporateaction.constants.Headers;
 import com.sdt.corporateaction.constants.Indices;
 import com.sdt.corporateaction.entity.CorporateAction;
+import com.sdt.corporateaction.entity.GlobalDetailPnl;
+import com.sdt.corporateaction.entity.GlobalDetailPnlTmp;
+import com.sdt.corporateaction.repository.GlobalDetailPnlRepo;
+import com.sdt.corporateaction.repository.GlobalDetailPnlTmpRepo;
 import com.sdt.corporateaction.service.CorporateActionService;
 import com.sdt.corporateaction.service.GoogleSheetsService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,11 @@ public class CorporateActionServiceImpl implements CorporateActionService {
     
     @Autowired
     GoogleSheetsService googleSheetsService;
+
+    @Autowired
+    GlobalDetailPnlRepo globalDetailPnlRepo;
+    @Autowired
+    GlobalDetailPnlTmpRepo globalDetailPnlTmpRepo;
     
     @Override
     public List<CorporateAction> getCorporateActions()
@@ -40,7 +49,7 @@ public class CorporateActionServiceImpl implements CorporateActionService {
         {
             List<Object> headers = spreadSheetValues.remove(0);
             for ( List<Object> row : spreadSheetValues ) {
-                if (headers.get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
+                if (row.size() >= 9 && headers.get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
                         && row.get(Indices.PROCESSESD_DATE).toString().equalsIgnoreCase(date()))
                 {
                     CorporateAction corporateAction = new CorporateAction();
@@ -54,12 +63,23 @@ public class CorporateActionServiceImpl implements CorporateActionService {
                     corporateAction.setSecurityCode(row.get(Indices.Security_Code).toString());
                     corporateAction.setProcessedDate(row.get(Indices.PROCESSESD_DATE).toString());
 
-                    corporateAction.setClientId(row.get(Indices.sample_clients_to_chk).toString());
+//                    corporateAction.setClientId(row.get(Indices.sample_clients_to_chk).toString());
                     corporateActions.add(corporateAction);
                 }
             }
         }
         return corporateActions;
+    }
+
+    @Override
+    public GlobalDetailPnl getDetailsForCorporateAction(String securityCode, String clientId, String expDate) {
+        return globalDetailPnlRepo.getDetailsForCorporateAction(securityCode, clientId, expDate);
+    }
+
+    @Override
+    public void savePnlDataByCorporateAction(GlobalDetailPnlTmp globalDetailPnlTmp)
+    {
+        globalDetailPnlTmpRepo.save(globalDetailPnlTmp);
     }
 
     private String date()
