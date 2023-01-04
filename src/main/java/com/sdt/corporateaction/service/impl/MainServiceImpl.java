@@ -42,8 +42,10 @@ public class MainServiceImpl implements MainService {
             for (CorporateAction ca : corporateActions)
             {
                 System.out.println("in corporateActions");
-//                if (!ca.getCRType().equalsIgnoreCase("Bonus"))
-//                    continue;
+                if (!ca.getCRType().equalsIgnoreCase("Split") && !ca.getCRType().equalsIgnoreCase("Bonus"))
+                    continue;
+                if (ca.getRatio().isEmpty())
+                    continue;
 
                 List<ClientList> clientLists = dataRepository.getClientsEligibleForCA(date(ca.getExDate(), YYYYMMDD), ca.getSecurityCode());
                 log.info("Total Clients for corporate action - {}", clientLists.size());
@@ -53,19 +55,26 @@ public class MainServiceImpl implements MainService {
                         GlobalDetailPnl pnlData = corporateActionService.getDetailsForCorporateAction(ca.getSecurityCode(), cl.getClientId(), date(ca.getExDate(), YYYYMMDD));
                         if (pnlData != null)
                         {
-                            GlobalDetailPnlTmp pnlDataNew = new GlobalDetailPnlTmp();
-                            double qty = cl.getBQty()- cl.getSQty();
+                            GlobalDetailPnl pnlDataNew = new GlobalDetailPnl();
+                            double qty;
                             String narration = "BY CORPORATE ACTION ";
                             String[] ratio = ca.getRatio().split(":");
-                            qty = Math.floor(qty/Double.parseDouble(ratio[0])) * Double.parseDouble(ratio[1]);
+
+                            if (ca.getCRType().equalsIgnoreCase("Bonus"))
+                            {
+                                qty = cl.getBQty()- cl.getSQty();
+                                qty = Math.floor(qty/Double.parseDouble(ratio[0])) * Double.parseDouble(ratio[1]);
+                                narration = narration + " (BONUS) RATIO " + ratio[0] + ".0000:" + ratio[1] + ".0000";
+                            }
+                            else
+                            {
+                                double netQty = Double.parseDouble(pnlData.getNetQty());
+                                qty = Math.floor(netQty/Double.parseDouble(ratio[0])) * Double.parseDouble(ratio[1]) - netQty;
+                                narration = narration + " (SPLIT) RATIO " + ratio[0] + ".0000:" + ratio[1] + ".0000 FROM ISIN: TO : ";
+                            }
 
                             if (qty > 0)
                             {
-                                if (ca.getCRType().equalsIgnoreCase("Bonus"))
-                                    narration = narration + " (BONUS) RATIO " + ratio[0] + ".0000:" + ratio[1] + ".0000";
-                                else
-                                    narration = narration + " (SPLIT) RATIO " + ratio[0] + ".0000:" + ratio[1] + ".0000 FROM ISIN: TO : ";
-
                                 pnlDataNew.setBQty(String.valueOf(qty));
                                 pnlDataNew.setNetQty(String.valueOf(qty));
                                 pnlDataNew.setNarration(narration);
@@ -88,12 +97,13 @@ public class MainServiceImpl implements MainService {
                                 pnlDataNew.setClientIdMail(pnlData.getClientIdMail());
                                 pnlDataNew.setBranchCodeMail(pnlData.getBranchCodeMail());
                                 log.info("Adding data for client {} . QTY - {} . ", cl.getClientId(), qty);
-                                corporateActionService.savePnlDataByCorporateAction(pnlDataNew);
+                                corporateActionService.savePnlDataByCorporateActionProd(pnlDataNew);
                             }
                         }
 //                    }
                 });
             }
+            log.info("COMPLETED");
         } else log.info("No CA found for {}", LocalDate.now());
     }
 

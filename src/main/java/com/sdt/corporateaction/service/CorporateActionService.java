@@ -13,4 +13,6 @@ public interface CorporateActionService {
     GlobalDetailPnl getDetailsForCorporateAction(String securityCode, String clientId, String expDate);
 
     void savePnlDataByCorporateAction(GlobalDetailPnlTmp globalDetailPnlTmp);
+
+    void savePnlDataByCorporateActionProd(GlobalDetailPnl globalDetailPnl);
 }

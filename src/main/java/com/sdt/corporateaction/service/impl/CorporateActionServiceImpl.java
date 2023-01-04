@@ -49,8 +49,9 @@ public class CorporateActionServiceImpl implements CorporateActionService {
         {
             List<Object> headers = spreadSheetValues.remove(0);
             for ( List<Object> row : spreadSheetValues ) {
-                if (row.size() >= 9 && headers.get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
-                        && row.get(Indices.PROCESSESD_DATE).toString().equalsIgnoreCase(date()))
+                if (headers.get(Indices.PROCESSESD_DATE).equals(Headers.PROCESSESD_DATE)
+//                        && row.get(Indices.PROCESSESD_DATE).toString().equalsIgnoreCase(date())
+                )
                 {
                     CorporateAction corporateAction = new CorporateAction();
                     corporateAction.setRatio(row.get(Indices.Ratio).toString());
@@ -61,7 +62,7 @@ public class CorporateActionServiceImpl implements CorporateActionService {
                     corporateAction.setCompanyName(row.get(Indices.Company_Name).toString());
                     corporateAction.setSecurityName(row.get(Indices.Security_Name).toString());
                     corporateAction.setSecurityCode(row.get(Indices.Security_Code).toString());
-                    corporateAction.setProcessedDate(row.get(Indices.PROCESSESD_DATE).toString());
+//                    corporateAction.setProcessedDate(row.get(Indices.PROCESSESD_DATE).toString());
 
 //                    corporateAction.setClientId(row.get(Indices.sample_clients_to_chk).toString());
                     corporateActions.add(corporateAction);
@@ -80,6 +81,11 @@ public class CorporateActionServiceImpl implements CorporateActionService {
     public void savePnlDataByCorporateAction(GlobalDetailPnlTmp globalDetailPnlTmp)
     {
         globalDetailPnlTmpRepo.save(globalDetailPnlTmp);
+    }
+
+    @Override
+    public void savePnlDataByCorporateActionProd(GlobalDetailPnl globalDetailPnl) {
+        globalDetailPnlRepo.save(globalDetailPnl);
     }
 
     private String date()
